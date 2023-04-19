@@ -10,6 +10,8 @@ public class FiveSevenPayHasher
 {
 	private readonly ILogger<FiveSevenPayHasher> _logger;
 
+	private JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web);
+
 	public FiveSevenPayHasher(
 		ILogger<FiveSevenPayHasher> logger)
 	{
@@ -17,14 +19,15 @@ public class FiveSevenPayHasher
 	}
 
 	public string ComputeHash(
-		string privateKeyBase64,
-		IEnumerable<KeyValuePair<string, object?>> dict,
+		string privateKey,
+		IEnumerable<KeyValuePair<string, string?>> dict,
 		long timestamp)
 	{
 		var json = JsonSerializer.Serialize(
-			dict.Where(kvp => kvp.Value is not null && !string.IsNullOrEmpty(kvp.Value.ToString()))
+			dict.Where(kvp => !string.IsNullOrEmpty(kvp.Value))
 				.ToDictionary(p => p.Key,
-					p => WebUtility.UrlEncode(p.Value!.ToString())));
+					p => p.Value!.ToString()), 
+			_jsonSerializerOptions);
 		
 		var fullText = $"{json}{timestamp}";
 
@@ -32,13 +35,11 @@ public class FiveSevenPayHasher
 
 		var shaHashed = SHA256.HashData(Encoding.UTF8.GetBytes(fullText));
 
-		var data = Convert.FromBase64String(privateKeyBase64);
-		var pem = Encoding.UTF8.GetString(data);
-
 		var rsa = RSA.Create();
-		rsa.ImportFromPem(pem);
+		rsa.ImportFromPem(privateKey);
 
 		var signature = rsa.SignHash(shaHashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
 		var hash =  Convert.ToBase64String(signature);
 
 		_logger.LogInformation("Hash: {hash}", hash);

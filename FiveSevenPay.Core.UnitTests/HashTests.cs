@@ -3,8 +3,8 @@ using System.Net.Http.Json;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Microsoft.Extensions.Logging;
+using System.Web;
+using Microsoft.Extensions.Logging.Abstractions;
 using Tgs.Payment.FiveSevenPay;
 using Xunit.Abstractions;
 
@@ -23,176 +23,75 @@ public class HashTests
 	[Fact]
 	public void HashTest()
 	{
+		var jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+
 		var privateKey = @"
 -----BEGIN RSA PRIVATE KEY-----
-MIICWwIBAAKBgQC7qh3f+UFIEdbP8voKBiwiXx3MRkNnp8xcWqQ0CowXBaCaWtAn
-/Xasf5dKMWUt6ihcK7Sm2h63wTUCrAZiJiZRHV52sVvsbvM6+3eBAh+jZu/P4lhk
-+ZJOekz4QNQicNsuweH8cyThHmiBchA3bszCD3s8BI5OJ41MXWqp47H3MwIDAQAB
-AoGANWvX1Uo/KyTo4YlpZDEdnys0cFIQHhHGOwQSej4GYwdXEJmJZ9jfT3uCtbwZ
-8VgW5SYL5vNwix6U2I3fw1DY1wGVWPxUAtuGHW/BjNoncVqau24nVMKDpUsiNoAT
-LLRJzcXRstEdJ/mbKSQSsYvTMhQPRQCPIx7KgPJ3eEy0JwECQQDXFyOL4OKur0eM
-vwihG9w2M1biuOIRZAfd6jN2em7pQDZg5xJRLHnYH2qf4IaTkxsh3xxtCk6fEMB0
-CjKapVndAkEA31uZKUEWRaGT2I89mPEteXZaI5eRQy4rLvHlQMbdJH9HNDLISGSE
-0lFk/id9gEPHwv91AC+jkYVVEI+97KpsTwJACW3ZQBOOvGuwrkndnfpzr+iWQYAr
-YOnKsn7G3MXHQPBwsdTPZ8GUYdYWvYWBQMztHpICVAFkqvJ4DV45E7B1/QJACNc1
-Tr62xPbKRU4WIBGbvS0EEFiVdVVEfE0yx8eXRTSMevJvnv3ri++Q0cZ6XzNPmtZF
-qUY5cS8X2Nn3qIBuXQJAANoUTkL8nejtdXoNFTvWNheRP8J10d1g3wNkvi0Qe+OK
-jNcFxveAuXEHUBab7hrUfQtlthiYME9l/AP3PkyvkA==
------END RSA PRIVATE KEY-----
-	";
-
-		var data = Encoding.UTF8.GetBytes(privateKey);
-		var pemBase64 = Convert.ToBase64String(data);
+MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
+akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
+p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
+gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
+p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
+TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
+qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
+jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
+P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
+VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
+sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
++XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
+ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
+-----END RSA PRIVATE KEY-----";
 
 		var merchantKey = "2b223bce3f024a3f885d213770a0fc5e";
 
-		var dict = new Dictionary<string, object?>
+		var dict = new Dictionary<string, string?>
 		{
 			["merchantKey"] = merchantKey,
-			["amount"] = 100,
+			["amount"] = "100",
 			["currency"] = "PHP",
 			["outID"] = "b5c88f52-85f0-428c-a914-3124b0e4feb4",
 			["verificationType"] = "Amount",
 			["payType"] = "Gcash",
-			["notifyUrl"] = "http://localhost/payment",
+			["remark"] = "",
+			["notifyUrl"] = "http://localhost/deposit/callback"
 		};
 
 		var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-		using var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-		var logger = loggerFactory.CreateLogger<FiveSevenPayHasher>();
+		var sut = new FiveSevenPayHasher(NullLogger<FiveSevenPayHasher>.Instance);
 
-		//var sut = new FiveSevenPayHasher(NullLogger<FiveSevenPayHasher>.Instance);
-		var sut = new FiveSevenPayHasher(logger);
-
-		var actual = sut.ComputeHash(pemBase64, dict, timestamp);
-
-		_testOutputHelper.WriteLine("signature: {0}", actual);
-
-//		var publicKey = @"
-//-----BEGIN RSA PUBLIC KEY-----
-//MIGJAoGBANgrjHugVHMpRJEex9MDqTuQGAIFcKupQsBW2ogQy6KSG4T7BOhW6jOd
-//0NMBvsMQg5bMPLaBenOBPS7WpKUGVkZK0f/utD5/FDa6Gei5LokBn1n3Hd1zuwoI
-//D4KpzlnaurtlY0L8Yj4RDYu9sYxscRY5XuYpSKo1dISFQQ2fnQ73AgMBAAE=
-//-----END RSA PUBLIC KEY-----
-//";
-
-		//var signature = Convert.FromBase64String(actual);
-
-		//var json = JsonSerializer.Serialize(
-		//	dict.Where(kvp => !string.IsNullOrEmpty(kvp.Value))
-		//		.ToDictionary(p => p.Key,
-		//			p => WebUtility.UrlEncode(p.Value)));
-
-		//var fullText = $"{json}{timestamp}";
-
-		//_testOutputHelper.WriteLine("full text: {0}", fullText);
-
-		//var hashedBody = SHA256.HashData(Encoding.UTF8.GetBytes(fullText));
-
-		//var rsa = RSA.Create();
+		var actual = sut.ComputeHash(privateKey, dict, timestamp);
 		
-		//var result = rsa.VerifyHash(hashedBody, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+		var publicKey = @"
+-----BEGIN PUBLIC KEY-----
+MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFjWApUuZQn9X3habxD8aFyFIHhR
+3JGCzQUgUlqNMG31SkwlIlJ/akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1
+N+FMbaWX/8cr+QdnArkcsxJ0p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0c
+yRI2HxD1sjHbvBZHAgMBAAE=
+-----END PUBLIC KEY-----";
 
-		//Assert.True(result);
+		var signature = Convert.FromBase64String(actual);
+
+		var json = JsonSerializer.Serialize(
+			dict.Where(kvp => !string.IsNullOrEmpty(kvp.Value))
+				.ToDictionary(p => p.Key,
+					p => p.Value!.ToString()),
+			jsonSerializerOptions);
+
+		var fullText = $"{json}{timestamp}";
+		
+		var hashedBody = SHA256.HashData(Encoding.UTF8.GetBytes(fullText));
+
+		var rsa = RSA.Create();
+		rsa.ImportFromPem(publicKey);
+
+		var result = rsa.VerifyHash(hashedBody, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+
+		Assert.True(result);
 	}
 
-	//	[Fact]
-	//	public void HashTest1()
-	//	{
-	//		var s = "HelloWorld";
-
-	//		var privateKey = @"-----BEGIN RSA PRIVATE KEY-----
-	//MIICWwIBAAKBgQC7qh3f+UFIEdbP8voKBiwiXx3MRkNnp8xcWqQ0CowXBaCaWtAn
-	///Xasf5dKMWUt6ihcK7Sm2h63wTUCrAZiJiZRHV52sVvsbvM6+3eBAh+jZu/P4lhk
-	//+ZJOekz4QNQicNsuweH8cyThHmiBchA3bszCD3s8BI5OJ41MXWqp47H3MwIDAQAB
-	//AoGANWvX1Uo/KyTo4YlpZDEdnys0cFIQHhHGOwQSej4GYwdXEJmJZ9jfT3uCtbwZ
-	//8VgW5SYL5vNwix6U2I3fw1DY1wGVWPxUAtuGHW/BjNoncVqau24nVMKDpUsiNoAT
-	//LLRJzcXRstEdJ/mbKSQSsYvTMhQPRQCPIx7KgPJ3eEy0JwECQQDXFyOL4OKur0eM
-	//vwihG9w2M1biuOIRZAfd6jN2em7pQDZg5xJRLHnYH2qf4IaTkxsh3xxtCk6fEMB0
-	//CjKapVndAkEA31uZKUEWRaGT2I89mPEteXZaI5eRQy4rLvHlQMbdJH9HNDLISGSE
-	//0lFk/id9gEPHwv91AC+jkYVVEI+97KpsTwJACW3ZQBOOvGuwrkndnfpzr+iWQYAr
-	//YOnKsn7G3MXHQPBwsdTPZ8GUYdYWvYWBQMztHpICVAFkqvJ4DV45E7B1/QJACNc1
-	//Tr62xPbKRU4WIBGbvS0EEFiVdVVEfE0yx8eXRTSMevJvnv3ri++Q0cZ6XzNPmtZF
-	//qUY5cS8X2Nn3qIBuXQJAANoUTkL8nejtdXoNFTvWNheRP8J10d1g3wNkvi0Qe+OK
-	//jNcFxveAuXEHUBab7hrUfQtlthiYME9l/AP3PkyvkA==
-	//-----END RSA PRIVATE KEY-----";
-
-	//		var rsa = RSA.Create();
-	//		rsa.ImportFromPem(privateKey);
-
-	//		var hashed = SHA256.HashData(Encoding.UTF8.GetBytes(s));
-	//		var signature = rsa.SignHash(hashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-	//		//var signature = rsa.SignData(hashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-	//		//signature.Dump();
-
-	//		var publicKey = @"-----BEGIN PUBLIC KEY-----
-	//MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDYK4x7oFRzKUSRHsfTA6k7kBgC
-	//BXCrqULAVtqIEMuikhuE+wToVuozndDTAb7DEIOWzDy2gXpzgT0u1qSlBlZGStH/
-	//7rQ+fxQ2uhnouS6JAZ9Z9x3dc7sKCA+Cqc5Z2rq7ZWNC/GI+EQ2LvbGMbHEWOV7m
-	//KUiqNXSEhUENn50O9wIDAQAB
-	//-----END PUBLIC KEY-----";
-
-	//		var rsa1 = RSA.Create();
-	//		rsa1.ImportFromPem(publicKey);
-	//		//rsa1.ImportRSAPublicKey(Encoding.UTF8.GetBytes(publicKey), out _);
-
-	//		var result = rsa1.VerifyHash(hashed, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-	//		//var result = rsa1.VerifyData(hashed, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-	//		Assert.True(result);
-	//	}
-
-	//	[Fact]
-	//	public void HashTest2()
-	//	{
-	//		var s = "HelloWorld";
-
-	//		var privateKey = @"-----BEGIN RSA PRIVATE KEY-----
-	//        MIICXAIBAAKBgQC7pbDRvuqRL0EsKjYGqPZWu4VFKI1iilisb3+yW5guIP4I+T8q
-	//        hP8dcUugiwa2fDwGgl3Y+PHASGdCfvYOfMefWlNUoGeLv4Tx6nqvq2OcVzRhYjUf
-	//        IpRE7z81xhmKtvxxLTNzTAoHN6rWqarKYMFydR/sD+oJs7LnnJoWieh1QQIDAQAB
-	//        AoGAPeQ4nfXKiHh9loOVrjysg472NglaGNZoyPc9tyZe21gmce9D1lJnkt57g0hX
-	//        vnjbk4oMSjRSCInZBSW7IqwlauiYwJra5O7MbLFaCTWDDnwFB+Zcz9E2PbPdFQFl
-	//        jyYfh0gm9zvo79oyqESXtfYaMfx45zPbJGOkhiPcjZDsZcECQQDyy2qz6L6JALIY
-	//        L1CtY6NTSm33rXv6Y+RzTBZovkK9OvMODvklsOhbcNQx0o7vQ5600dbHORwteCcm
-	//        cHMgFDGnAkEAxdpsD2omWPzRYCRmk72aqRtccp9AE9eE75mUG6sMt3NDqwGeTuWV
-	//        EH70XC3yIwqFmkc3zzNjZqsxTEDtuRtu1wJBAJoAHpko2poJv+0JLfIczf7JqgC8
-	//        oHPMop3jOB+N9sUSPBLBupSGpotBgMZtWM44pNTqeIH7Hn1UxfhiwRMq2+cCQDwZ
-	//        K8fG450WNncwt2PbLRZ+9CbxDqK4TW4GRYHeBD/ZKE3ScQbgH9Zh6dHyNuHD+W8y
-	//        gNZUcrYl/BSAiHU4ywMCQDok1QgvVmc8jma9qK2dxmd4IR8varRPti4VQAMumdaE
-	//        4s1Ofdw+8Bl2FATkdQZDLUQbWat4E5l8uGLfYZAHSow=
-	//        -----END RSA PRIVATE KEY-----";
-
-	//		var rsa = RSA.Create();
-	//		rsa.ImportFromPem(privateKey);
-
-	//		var hashed = SHA256.HashData(Encoding.UTF8.GetBytes(s));
-	//		var signature = rsa.SignHash(hashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-	//		//var signature = rsa.SignData(hashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-	//		//signature.Dump();
-
-	//		var publicKey = @"-----BEGIN PUBLIC KEY-----
-	//        MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7pbDRvuqRL0EsKjYGqPZWu4VF
-	//        KI1iilisb3+yW5guIP4I+T8qhP8dcUugiwa2fDwGgl3Y+PHASGdCfvYOfMefWlNU
-	//        oGeLv4Tx6nqvq2OcVzRhYjUfIpRE7z81xhmKtvxxLTNzTAoHN6rWqarKYMFydR/s
-	//        D+oJs7LnnJoWieh1QQIDAQAB
-	//        -----END PUBLIC KEY-----";
-
-	//		var rsa1 = RSA.Create();
-	//		rsa1.ImportFromPem(publicKey);
-	//		//rsa1.ImportRSAPublicKey(Encoding.UTF8.GetBytes(publicKey), out _);
-
-	//		var result = rsa1.VerifyHash(hashed, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-	//		//var result = rsa1.VerifyData(hashed, signature, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
-	//		Assert.True(result);
-	//	}
-
-	[Fact]
-	public async Task HashTest4()
+	//[Fact]
+	public async Task Test_Deposit()
 	{
 		var jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
@@ -221,21 +120,20 @@ jNcFxveAuXEHUBab7hrUfQtlthiYME9l/AP3PkyvkA==
 			["merchantKey"] = merchantKey,
 			["amount"] = "100",
 			["currency"] = "PHP",
-			["outID"] = "b5c88f52-85f0-428c-a914-3124b0e4feb4",
+			//["outID"] = "b5c88f52-85f0-428c-a914-3124b0e4feb4",
+			["outID"] = Guid.NewGuid().ToString(),
 			["verificationType"] = "Amount",
 			["payType"] = "Gcash",
-			["remark"] = ""
-			//["notifyUrl"] = WebUtility.UrlEncode("http://127.0.0.1/payment"),
+			["remark"] = "",
+			//["notifyUrl"] = HttpUtility.UrlEncode("https://dev-payment.rpgp.cc/fivesevenpay-local/deposit/callback"),
+			["notifyUrl"] = "https://dev-payment.rpgp.cc/fivesevenpay-local/deposit/callback"
 		};
-
+		
 		dict = dict.Where(kvp => !string.IsNullOrEmpty(kvp.Value))
-			.ToDictionary(p => p.Key,
-				p => WebUtility.UrlEncode(p.Value));
+			.ToDictionary(p => p.Key, p => p.Value);
 
 		var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-
-		//var json = JsonSerializer.Serialize(dict);
-
+		
 		var json = JsonSerializer.Serialize(dict, jsonSerializerOptions);
 
 		var fullText = $"{json}{timestamp}";
@@ -246,11 +144,9 @@ jNcFxveAuXEHUBab7hrUfQtlthiYME9l/AP3PkyvkA==
 
 		var rsa = RSA.Create();
 		rsa.ImportFromPem(privateKey);
-		//rsa.ImportRSAPrivateKey(Encoding.UTF8.GetBytes(privateKey), out _);
-
+		
 		var hash = rsa.SignHash(shaHashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-		//var hash = rsa.SignData(shaHashed, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
-
+		
 		var signature = Convert.ToBase64String(hash);
 
 		_testOutputHelper.WriteLine("Signature: {0}", signature);
