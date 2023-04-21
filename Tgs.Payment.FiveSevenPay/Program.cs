@@ -1,4 +1,3 @@
-using FluentdForward.OpenTelemetry.Exporter.Logs;
 using FluentdForward.OpenTelemetry.MessagePack;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Options;
@@ -68,7 +67,6 @@ builder.Services
 	{
 		logging.LoggingFields = HttpLoggingFields.All;
 		logging.MediaTypeOptions.AddText("application/x-www-form-urlencoded");
-		logging.MediaTypeOptions.AddText("text/html");
 		logging.MediaTypeOptions.AddText("application/json");
 	})
 	.AddOpenTelemetry()
