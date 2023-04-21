@@ -5,9 +5,8 @@ public record FiveSevenPayWithdrawSettings(
 	string PrivateKeyBase64,
 	string PublicKeyBase64,
 	string Currency,
-	FiveSevenPaymentType PaymentType,
+	FiveSevenPayType PayType,
 	Guid FormId,
-	string BankCode,
 	string BankCardName,
 	string BankCardAccount);
 

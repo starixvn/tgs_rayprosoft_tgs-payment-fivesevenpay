@@ -32,7 +32,7 @@ internal class DepositProcessor:IMessageProcessor
 			FiveSevenPayUtility.SerializerOptions)!;
 
 		var order = new FiveSevenPayDepositOrder(
-			settings.PaymentType,
+			settings.PayType,
 			settings.Currency,
 			decimal.Parse(request.Amount),
 			settings.FormId,

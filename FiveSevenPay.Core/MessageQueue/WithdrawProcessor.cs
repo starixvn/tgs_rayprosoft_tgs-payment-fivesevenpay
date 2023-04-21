@@ -32,7 +32,7 @@ internal class WithdrawProcessor : IMessageProcessor
 			FiveSevenPayUtility.SerializerOptions)!;
 
 		var order = new FiveSevenPayWithdrawOrder(
-			settings.PaymentType,
+			settings.PayType,
 			settings.Currency,
 			decimal.Parse(request.Amount),
 			settings.FormId,

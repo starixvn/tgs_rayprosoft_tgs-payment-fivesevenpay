@@ -13,10 +13,10 @@ internal class FiveSevenPayClient
 	private readonly JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web);
 	private readonly ILogger<FiveSevenPayClient> _logger;
 
-	private readonly IReadOnlyDictionary<FiveSevenPaymentType, string> _verificationTypeMap =
-		new Dictionary<FiveSevenPaymentType, string>
+	private readonly IReadOnlyDictionary<FiveSevenPayType, string> _verificationTypeMap =
+		new Dictionary<FiveSevenPayType, string>
 		{
-			[FiveSevenPaymentType.GCash] = "Amount"
+			[FiveSevenPayType.GCash] = "Amount"
 		};
 
 	public FiveSevenPayClient(
@@ -35,7 +35,7 @@ internal class FiveSevenPayClient
 		FiveSevenPayDepositOrder order,
 		CancellationToken cancellationToken = default)
 	{
-		if (!_verificationTypeMap.TryGetValue(order.PaymentType, out var verificationType))
+		if (!_verificationTypeMap.TryGetValue(order.PayType, out var verificationType))
 			throw new ArgumentException("Invalid payment type");
 
 		var data = new Dictionary<string, string?>
@@ -45,7 +45,7 @@ internal class FiveSevenPayClient
 			["currency"] = order.Currency,
 			["outID"] = order.FormId.ToString(),
 			["verificationType"] = verificationType,
-			["payType"] = order.PaymentType.Code,
+			["payType"] = order.PayType.Code,
 			["notifyUrl"] = order.CallbackUrl.AbsoluteUri
 		};
 
@@ -93,9 +93,9 @@ internal class FiveSevenPayClient
 			["amount"] = order.Amount.ToString(),
 			["currency"] = order.Currency,
 			["outID"] = order.FormId.ToString(),
-			["payType"] = order.PaymentType.Code,
+			["payType"] = order.PayType.Code,
 			["collectionAccountNumber"] = order.Phone,
-			["collectionsTypeName"] = order.PaymentType == FiveSevenPaymentType.GCash ? order.PaymentType.Code : string.Empty,
+			["collectionsTypeName"] = order.PayType == FiveSevenPayType.GCash ? order.PayType.Code : string.Empty,
 			["notifyUrl"] = order.CallbackUrl.AbsoluteUri
 		};
 

@@ -5,7 +5,7 @@ public record FiveSevenPayDepositSettings(
 	string PrivateKeyBase64,
 	string PublicKeyBase64,
 	string Currency,
-	FiveSevenPaymentType PaymentType,
+	FiveSevenPayType PayType,
 	Guid FormId);
 
 	

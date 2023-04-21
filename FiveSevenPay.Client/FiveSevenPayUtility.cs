@@ -11,7 +11,7 @@ public class FiveSevenPayUtility
 		DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault,
 		Converters =
 		{
-			new FiveSevenPaymentTypeConverter()
+			new FiveSevenPayTypeConverter()
 		}
 	};
 }

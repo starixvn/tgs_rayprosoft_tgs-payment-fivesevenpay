@@ -74,9 +74,8 @@ var withdrawSettings = new FiveSevenPayWithdrawSettings(
 	Convert.ToBase64String(Encoding.UTF8.GetBytes(privateKey)),
 	Convert.ToBase64String(Encoding.UTF8.GetBytes(publicKey)),
 	"PHP",
-	FiveSevenPaymentType.GCash,
+	FiveSevenPayType.GCash,
 	Guid.NewGuid(),
-	"Gcash",
 	"1111111",
 	"1111111");
 
