@@ -1,9 +1,31 @@
+using FluentdForward.OpenTelemetry.Exporter.Logs;
+using FluentdForward.OpenTelemetry.MessagePack;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Options;
+using OpenTelemetry.Instrumentation.AspNetCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Tgs.Payment.FiveSevenPay;
 using Tgs.Payment.FiveSevenPay.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging
+	.AddOpenTelemetry(options =>
+	{
+		options.IncludeFormattedMessage = true;
+		options.ParseStateValues = true;
+		_ = options.AddFluentdForwardExporter(fluentOptions =>
+		{
+			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
+			fluentOptions.Host = nodeIp;
+			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
+			fluentOptions.UseMessagePack(LogRecordFormatterResolver.GetResolverInstanceWithExtendInfo(
+				"MachineName",
+				() => Environment.MachineName));
+		});
+	});
 
 builder.Services
 	.AddFiveSevenPay(
@@ -41,17 +63,38 @@ builder.Services.AddMessageQueue()
 builder.Services.AddControllers();
 
 builder.Services
+	.AddProfileViewer()
 	.AddHttpLogging(logging =>
 	{
 		logging.LoggingFields = HttpLoggingFields.All;
-		
-		_ = logging.RequestHeaders.Add("signature");
-		_ = logging.RequestHeaders.Add("timestamp");
-
 		logging.MediaTypeOptions.AddText("application/x-www-form-urlencoded");
 		logging.MediaTypeOptions.AddText("text/html");
 		logging.MediaTypeOptions.AddText("application/json");
-	});
+	})
+	.AddOpenTelemetry()
+	.ConfigureResource(_ => ResourceBuilder.CreateDefault().AddEnvironmentVariableDetector())
+	.WithTracing(tracerProviderBuilder => tracerProviderBuilder
+		.AddSource("Tgs.*")
+		.AddAspNetCoreInstrumentation()
+		.AddHttpClientInstrumentation()
+		.AddProfileViewExporter()
+		.AddOtlpExporter())
+	.WithMetrics(meterProviderBuilder => meterProviderBuilder
+		.AddRuntimeInstrumentation()
+		.AddAspNetCoreInstrumentation()
+		.AddHttpClientInstrumentation()
+		.AddOtlpExporter())
+	.Services
+	.Configure<AspNetCoreInstrumentationOptions>(options => 
+		options.Filter = httpContext 
+			=> !httpContext.Request.Path.HasValue
+			   || !httpContext.Request.Path.StartsWithSegments("/swagger")
+			   && !httpContext.Request.Path.StartsWithSegments("/healthz")
+			   && !httpContext.Request.Path.StartsWithSegments("/metrics")
+			   && !new[] { "html", "ico", "png", "jpg" }.Any(
+				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
+
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddHealthChecks();
 
@@ -75,5 +118,8 @@ app.Use(async (context, next) =>
 		_ = await stream.ReadToEndAsync().ConfigureAwait(false);
 	}
 });
+
+app.MapSwagger();
+app.UseSwaggerUI();
 
 app.Run();
