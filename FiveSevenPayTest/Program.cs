@@ -51,22 +51,43 @@ var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
 var paymentClient = app.Services.GetRequiredService<IPaymentClient>();
 
-var depositSettings = new FiveSevenPayDepositSettings(
+//var depositSettings = new FiveSevenPayDepositSettings(
+//	merchantKey,
+//	Convert.ToBase64String(Encoding.UTF8.GetBytes(privateKey)),
+//	Convert.ToBase64String(Encoding.UTF8.GetBytes(publicKey)),
+//	"PHP",
+//	FiveSevenPaymentType.GCash,
+//	Guid.NewGuid());
+
+//var applyInfo = JsonSerializer.Serialize(depositSettings, FiveSevenPayUtility.SerializerOptions);
+//logger.LogInformation("ApplyInfo: {applyInfo}", applyInfo);
+
+//var depositReturn = await paymentClient.DepositAsync(
+//	"tgs.payment.fivesevenpay.deposit",
+//	100M,
+//	applyInfo).ConfigureAwait(false);
+
+//logger.LogInformation("DepositReturn: {depositReturn}", depositReturn);
+
+var withdrawSettings = new FiveSevenPayWithdrawSettings(
 	merchantKey,
 	Convert.ToBase64String(Encoding.UTF8.GetBytes(privateKey)),
 	Convert.ToBase64String(Encoding.UTF8.GetBytes(publicKey)),
 	"PHP",
 	FiveSevenPaymentType.GCash,
-	Guid.NewGuid());
+	Guid.NewGuid(),
+	"Gcash",
+	"1111111",
+	"1111111");
 
-var applyInfo = JsonSerializer.Serialize(depositSettings, FiveSevenPayUtility.SerializerOptions);
+var applyInfo = JsonSerializer.Serialize(withdrawSettings, FiveSevenPayUtility.SerializerOptions);
 logger.LogInformation("ApplyInfo: {applyInfo}", applyInfo);
 
-var depositReturn = await paymentClient.DepositAsync(
-	"tgs.payment.fivesevenpay.deposit",
-	100M,
+var withdrawReturn = await paymentClient.WithdrawAsync(
+	"tgs.payment.fivesevenpay.withdraw",
+	20M,
 	applyInfo).ConfigureAwait(false);
 
-logger.LogInformation("DepositReturn: {depositReturn}", depositReturn);
+logger.LogInformation("WithdrawReturn: {withdrawReturn}", withdrawReturn);
 
 Console.ReadLine();

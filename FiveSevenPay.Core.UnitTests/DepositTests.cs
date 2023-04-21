@@ -21,6 +21,8 @@ public class DepositTests
 
 		// Assert
 		_ = fakePaymentServiceClient.Received(1)
-			.GetDepositFormAsync(Arg.Is(query.FormId));
+			.GetDepositFormAsync(
+				Arg.Is(query.FormId),
+				Arg.Any<CancellationToken>());
 	}
 }

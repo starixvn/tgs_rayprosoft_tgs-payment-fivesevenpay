@@ -8,11 +8,10 @@ namespace Tgs.Payment.FiveSevenPay;
 
 internal class FiveSevenPayClient
 {
-	private readonly HttpClient _httpClient;
 	private readonly FiveSevenPayHasher _fiveSevenPayHasher;
-	private readonly ILogger<FiveSevenPayClient> _logger;
-
+	private readonly HttpClient _httpClient;
 	private readonly JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web);
+	private readonly ILogger<FiveSevenPayClient> _logger;
 
 	private readonly IReadOnlyDictionary<FiveSevenPaymentType, string> _verificationTypeMap =
 		new Dictionary<FiveSevenPaymentType, string>
@@ -31,9 +30,9 @@ internal class FiveSevenPayClient
 	}
 
 	public async ValueTask<FiveSevenPayClientDepositResponse> DepositAsync(
-		string merchantKey, 
-		string privateKey, 
-		FiveSevenPayDepositOrder order, 
+		string merchantKey,
+		string privateKey,
+		FiveSevenPayDepositOrder order,
 		CancellationToken cancellationToken = default)
 	{
 		if (!_verificationTypeMap.TryGetValue(order.PaymentType, out var verificationType))
@@ -53,7 +52,7 @@ internal class FiveSevenPayClient
 		var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
 		var signature = _fiveSevenPayHasher.ComputeHash(privateKey, data, timestamp);
-		
+
 		_httpClient.DefaultRequestHeaders.Add("key", merchantKey);
 		_httpClient.DefaultRequestHeaders.Add("signature", signature);
 		_httpClient.DefaultRequestHeaders.Add("timestamp", timestamp.ToString());
@@ -80,5 +79,55 @@ internal class FiveSevenPayClient
 			throw new ApiFailException(node["msg"]?.GetValue<string>());
 
 		return node["data"].Deserialize<FiveSevenPayClientDepositResponse>(_jsonSerializerOptions)!;
+	}
+
+	public async ValueTask<FiveSevenPayClientWithdrawResponse> WithdrawAsync(
+		string merchantKey,
+		string privateKey,
+		FiveSevenPayWithdrawOrder order,
+		CancellationToken cancellationToken = default)
+	{
+		var data = new Dictionary<string, string?>
+		{
+			["merchantKey"] = merchantKey,
+			["amount"] = order.Amount.ToString(),
+			["currency"] = order.Currency,
+			["outID"] = order.FormId.ToString(),
+			["payType"] = order.PaymentType.Code,
+			["collectionAccountNumber"] = order.Phone,
+			["collectionsTypeName"] = order.PaymentType == FiveSevenPaymentType.GCash ? order.PaymentType.Code : string.Empty,
+			["notifyUrl"] = order.CallbackUrl.AbsoluteUri
+		};
+
+		var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+		var signature = _fiveSevenPayHasher.ComputeHash(privateKey, data, timestamp);
+
+		_httpClient.DefaultRequestHeaders.Add("key", merchantKey);
+		_httpClient.DefaultRequestHeaders.Add("signature", signature);
+		_httpClient.DefaultRequestHeaders.Add("timestamp", timestamp.ToString());
+
+		var response = await _httpClient.PostAsJsonAsync(
+			"/api?option=mutation&field=createTransferAPI",
+			data,
+			_jsonSerializerOptions,
+			cancellationToken).ConfigureAwait(false);
+
+		var body = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+		if (_logger.IsEnabled(LogLevel.Information))
+			_logger.LogInformation("Withdraw Body: {body}", body);
+
+		_ = response.EnsureSuccessStatusCode();
+
+		var node = JsonSerializer.Deserialize<JsonNode>(body, _jsonSerializerOptions);
+
+		if (node is null)
+			throw new ApiFailException("Withdraw response can't read.");
+
+		if (node["code"]!.ToString() != "0")
+			throw new ApiFailException(node["msg"]?.GetValue<string>());
+
+		return node["data"].Deserialize<FiveSevenPayClientWithdrawResponse>(_jsonSerializerOptions)!;
 	}
 }

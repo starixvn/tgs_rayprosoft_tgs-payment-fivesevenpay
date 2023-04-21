@@ -56,7 +56,7 @@ public class DepositController : ControllerBase
 
 		if (!isValid)
 		{
-			_logger.LogWarning("Sign value invalid of form({id}). data: {data}, signature: {signature}, timestamp: {timestamp}", viewModel.FormId, requestData, signature, timestamp);
+			_logger.LogWarning("Sign value invalid of deposit form({id}). data: {data}, signature: {signature}, timestamp: {timestamp}", viewModel.FormId, requestData, signature, timestamp);
 			return "fail";
 		}
 

@@ -31,7 +31,11 @@ builder.Services.AddMessageQueue()
 		.AddProcessor(
 			ProcessorTypes.DepositProcessorType,
 			"tgs.payment.fivesevenpay.deposit",
-			"tgs.payment.fivesevenpay.deposit"))
+			"tgs.payment.fivesevenpay.deposit")
+		.AddProcessor(
+			ProcessorTypes.WithdrawProcessorType,
+			"tgs.payment.fivesevenpay.withdraw",
+			"tgs.payment.fivesevenpay.withdraw"))
 	.AddNatsGlobPatternExchange("*");
 
 builder.Services.AddControllers();
@@ -40,7 +44,7 @@ builder.Services
 	.AddHttpLogging(logging =>
 	{
 		logging.LoggingFields = HttpLoggingFields.All;
-
+		
 		_ = logging.RequestHeaders.Add("signature");
 		_ = logging.RequestHeaders.Add("timestamp");
 

@@ -1,9 +1,7 @@
-﻿using System.Net.Http.Json;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.VisualStudio.TestPlatform.Common;
 using Tgs.Payment.FiveSevenPay;
 using Xunit.Abstractions;
 
