@@ -39,7 +39,7 @@ internal class WithdrawProcessor : IMessageProcessor
 			settings.BankCardAccount,
 			new Uri($"{_options.CallbackBaseUrl}/withdraw/callback"));
 
-		var privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(settings.PrivateKeyBase64));
+		var privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(settings.PrivateKey));
 
 		var withdrawResponse = await _fiveSevenPayClient.WithdrawAsync(
 			settings.MerchantKey,

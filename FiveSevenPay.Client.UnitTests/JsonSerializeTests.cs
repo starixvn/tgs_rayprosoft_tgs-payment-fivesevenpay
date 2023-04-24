@@ -18,7 +18,7 @@ public class JsonSerializeTests
 			Guid.Parse("fb6a7c26-6438-4508-9440-e3f07b91dcfa"));
 
 		var expected = """
-{"merchantKey":"test123","privateKeyBase64":"1234567890","publicKeyBase64":"1234567890","currency":"PHP","payType":"Gcash","formId":"fb6a7c26-6438-4508-9440-e3f07b91dcfa"}
+{"merchantKey":"test123","privateKey":"1234567890","publicKey":"1234567890","currency":"PHP","payType":"Gcash","formId":"fb6a7c26-6438-4508-9440-e3f07b91dcfa"}
 """;
 
 		// Act
@@ -33,7 +33,7 @@ public class JsonSerializeTests
 	{
 		// Arrange
 		var sut = """
-{"merchantKey":"test123","privateKeyBase64":"1234567890","publicKeyBase64":"1234567890","currency":"PHP","payType":"Gcash","formId":"fb6a7c26-6438-4508-9440-e3f07b91dcfa"}
+{"merchantKey":"test123","privateKey":"1234567890","publicKey":"1234567890","currency":"PHP","payType":"Gcash","formId":"fb6a7c26-6438-4508-9440-e3f07b91dcfa"}
 """;
 
 		var expected = new FiveSevenPayDepositSettings(

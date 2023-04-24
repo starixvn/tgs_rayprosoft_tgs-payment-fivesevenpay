@@ -7,7 +7,7 @@
     <RootNamespace>Tgs.Payment.FiveSevenPay.Client</RootNamespace>
     <PackageId>Tgs.Payment.FiveSevenPay.Client</PackageId>
     <Authors>Raypro</Authors>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Title>Tgs.Payment.FiveSevenPay.Client</Title>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/tgs-payment-fivesevenpay</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/rayprosoft/tgs-payment-fivesevenpay.git</RepositoryUrl>

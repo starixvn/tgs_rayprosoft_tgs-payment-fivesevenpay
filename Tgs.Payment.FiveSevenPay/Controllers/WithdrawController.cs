@@ -49,7 +49,7 @@ public class WithdrawController : ControllerBase
 
 		var settings = withdrawForm.ApplyInfo!.Settings;
 
-		var publicKey = Encoding.UTF8.GetString(Convert.FromBase64String(settings.PublicKeyBase64));
+		var publicKey = Encoding.UTF8.GetString(Convert.FromBase64String(settings.PublicKey));
 
 		var requestData = node.ToJsonString();
 		var isValid = hasher.VerifyHash(publicKey, requestData, signature, timestamp);

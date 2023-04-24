@@ -5,8 +5,8 @@ namespace Tgs.Payment.FiveSevenPay.Client;
 
 public record FiveSevenPayDepositSettings(
 	string MerchantKey,
-	string PrivateKeyBase64,
-	string PublicKeyBase64,
+	string PrivateKey,
+	string PublicKey,
 	string Currency,
 	[property: JsonConverter(typeof(FiveSevenPayTypeConverter))] FiveSevenPayType PayType,
 	Guid FormId);

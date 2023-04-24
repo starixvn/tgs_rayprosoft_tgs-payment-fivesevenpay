@@ -38,7 +38,7 @@ internal class DepositProcessor:IMessageProcessor
 			settings.FormId,
 			new Uri($"{_options.CallbackBaseUrl}/deposit/callback"));
 
-		var privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(settings.PrivateKeyBase64));
+		var privateKey = Encoding.UTF8.GetString(Convert.FromBase64String(settings.PrivateKey));
 
 		var depositResponse = await _fiveSevenPayClient.DepositAsync(
 			settings.MerchantKey,
