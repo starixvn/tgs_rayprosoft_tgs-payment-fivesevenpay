@@ -1,11 +1,14 @@
-﻿namespace Tgs.Payment.FiveSevenPay.Client;
+﻿using System.Text.Json.Serialization;
+using Tgs.Payment.FiveSevenPay.Client.JsonConverters;
+
+namespace Tgs.Payment.FiveSevenPay.Client;
 
 public record FiveSevenPayDepositSettings(
 	string MerchantKey,
 	string PrivateKeyBase64,
 	string PublicKeyBase64,
 	string Currency,
-	FiveSevenPayType PayType,
+	[property: JsonConverter(typeof(FiveSevenPayTypeConverter))] FiveSevenPayType PayType,
 	Guid FormId);
 
 	
