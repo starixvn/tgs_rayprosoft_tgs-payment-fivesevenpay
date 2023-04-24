@@ -22,7 +22,7 @@ public class WithdrawTests
 	}
 
 	[Fact]
-	public async Task 存款回調呼叫()
+	public async Task 提款回調呼叫()
 	{
 		var fakePaymentServiceClient = Substitute.For<IPaymentServiceClient>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();

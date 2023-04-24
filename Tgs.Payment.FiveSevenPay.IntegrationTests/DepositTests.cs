@@ -1,4 +1,4 @@
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Hosting;
@@ -22,7 +22,7 @@ public class DepositTests
 	}
 
 	[Fact]
-	public async Task �x�Ȧ^�թI�s()
+	public async Task 儲值回調呼叫()
 	{
 		var fakePaymentServiceClient = Substitute.For<IPaymentServiceClient>();
 		var fakePaymentClient = Substitute.For<IPaymentClient>();
