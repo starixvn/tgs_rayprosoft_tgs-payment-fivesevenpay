@@ -1,6 +1,8 @@
-﻿namespace Tgs.Payment.FiveSevenPay.Client;
+﻿using System.Text.Json.Serialization;
+
+namespace Tgs.Payment.FiveSevenPay.Client;
 
 public record FiveSevenPayBankInfo(
-	string BankCardName,
-	string BankCardAccount);
+	[property: JsonPropertyName("username")] string BankCardName,
+	[property: JsonPropertyName("phone")] string BankCardAccount);
 

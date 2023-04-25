@@ -17,8 +17,8 @@ public class FiveSevenPayType
 		Code = code;
 	}
 
-	public static FiveSevenPayType? Parse(string paymentType)
-		=> _PayTypes.TryGetValue(paymentType, out var value)
+	public static FiveSevenPayType? Parse(string payType)
+		=> _PayTypes.TryGetValue(payType, out var value)
 			? value
 			: null;
 }
