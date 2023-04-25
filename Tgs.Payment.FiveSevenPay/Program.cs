@@ -98,7 +98,7 @@ builder.Services
 				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
 
 builder.Services
-	//.AddEndpointsApiExplorer()
+	.AddEndpointsApiExplorer()
 	.AddSwaggerGen(options =>
 	{
 		options.SwaggerDoc("Payment", new OpenApiInfo
