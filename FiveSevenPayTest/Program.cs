@@ -56,7 +56,7 @@ var paymentClient = app.Services.GetRequiredService<IPaymentClient>();
 //	Convert.ToBase64String(Encoding.UTF8.GetBytes(privateKey)),
 //	Convert.ToBase64String(Encoding.UTF8.GetBytes(publicKey)),
 //	"PHP",
-//	FiveSevenPaymentType.GCash,
+//	FiveSevenPayType.GCash,
 //	Guid.NewGuid());
 
 //var applyInfo = JsonSerializer.Serialize(depositSettings, FiveSevenPayUtility.SerializerOptions);
