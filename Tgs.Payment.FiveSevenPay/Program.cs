@@ -96,8 +96,6 @@ builder.Services
 			   && !new[] { "html", "ico", "png", "jpg" }.Any(
 				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
 
-builder.Services.AddSwaggerGen();
-
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
@@ -120,8 +118,5 @@ app.Use(async (context, next) =>
 		_ = await stream.ReadToEndAsync().ConfigureAwait(false);
 	}
 });
-
-app.MapSwagger();
-app.UseSwaggerUI();
 
 app.Run();
