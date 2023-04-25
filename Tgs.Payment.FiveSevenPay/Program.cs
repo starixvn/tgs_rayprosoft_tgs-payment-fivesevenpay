@@ -7,7 +7,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Payment.FiveSevenPay;
-using Tgs.Payment.FiveSevenPay.InputFormatters;
 using Tgs.Payment.FiveSevenPay.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -65,8 +64,7 @@ builder.Services.AddMessageQueue()
 			"tgs.payment.fivesevenpay.withdraw"))
 	.AddNatsGlobPatternExchange("*");
 
-builder.Services.AddControllers(options 
-	=> options.InputFormatters.Add(new TextPlainInputFormatter()));
+builder.Services.AddControllers();
 
 builder.Services
 	.AddProfileViewer()

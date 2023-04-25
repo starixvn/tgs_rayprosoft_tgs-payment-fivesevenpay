@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Mvc;
+using Tgs.Payment.FiveSevenPay.ViewModels;
 
 namespace Tgs.Payment.FiveSevenPay.Controllers;
 
@@ -8,23 +9,23 @@ namespace Tgs.Payment.FiveSevenPay.Controllers;
 [ApiExplorerSettings(GroupName = "DataConverter")]
 public class DataConverterController : ControllerBase
 {
-	[HttpPost("base64:to")]
-	[Consumes("text/plain")]
-	public ValueTask<string> ConvertToBase64StringAsync(
-		[FromBody] string original)
+	[HttpPost("base64:from")]
+	public ValueTask<string> ConvertFromBase64StringAsync(
+		FromBase64ViewModel viewModel)
 	{
-		var value = original.ReplaceLineEndings();
-
-		var data = Encoding.UTF8.GetBytes(value);
-		return ValueTask.FromResult(Convert.ToBase64String(data));
+		var data = Convert.FromBase64String(viewModel.Base64String);
+		return ValueTask.FromResult(Encoding.UTF8.GetString(data));
 	}
 
-	[HttpPost("base64:from")]
-	[Consumes("text/plain")]
-	public ValueTask<string> ConvertFromBase64StringAsync(
-		[FromBody] string base64)
+	[HttpPost("base64:to")]
+	public async ValueTask<string> ConvertToBase64StringAsync(
+		[FromForm(Name = "file")] IFormFile file)
 	{
-		var data = Convert.FromBase64String(base64);
-		return ValueTask.FromResult(Encoding.UTF8.GetString(data));
+		await using var stream = file.OpenReadStream();
+		var streamReader = new StreamReader(stream);
+		var value = await streamReader.ReadToEndAsync();
+		
+		var data = Encoding.UTF8.GetBytes(value);
+		return Convert.ToBase64String(data);
 	}
 }
