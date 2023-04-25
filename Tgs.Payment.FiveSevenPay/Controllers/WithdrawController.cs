@@ -13,6 +13,7 @@ namespace Tgs.Payment.FiveSevenPay.Controllers;
 
 [Route("[controller]")]
 [ApiController]
+[ApiExplorerSettings(GroupName = "Payment")]
 public class WithdrawController : ControllerBase
 {
 	private readonly JsonSerializerOptions _jsonSerializerOptions = new(JsonSerializerDefaults.Web);

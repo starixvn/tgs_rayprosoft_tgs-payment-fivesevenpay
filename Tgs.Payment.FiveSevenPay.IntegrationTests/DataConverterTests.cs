@@ -1,0 +1,76 @@
+﻿using System.Text;
+
+namespace Tgs.Payment.FiveSevenPay.IntegrationTests;
+
+public class DataConverterTests
+{
+	[Fact]
+	public async Task 將字串轉換至Base64字串()
+	{
+		await using var web = FiveSevenPayTestHost.WebApplicationFactory;
+
+		var httpClient = web.CreateClient();
+
+		var original = """
+			-----BEGIN RSA PRIVATE KEY-----
+			MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
+			akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
+			p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
+			gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
+			p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
+			TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
+			qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
+			jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
+			P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
+			VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
+			sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
+			+XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
+			ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
+			-----END RSA PRIVATE KEY-----
+			""";
+
+		var expected = "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQ0KTUlJQ1d3SUJBQUtCZ0ZqV0FwVXVaUW45WDNoYWJ4RDhhRnlGSUhoUjNKR0N6UVVnVWxxTk1HMzFTa3dsSWxKLw0KYWtKNHZ6M3FCQmFmTnhlNHR5TzR1cWR4VHp5cFVJOVBYbkNyazV6MU4rRk1iYVdYLzhjcitRZG5Bcmtjc3hKMA0KcCsyUXk5clpTa2FjeUNQak1FOVhKekllYktuZjBYVEdwVC96NlQwY3lSSTJIeEQxc2pIYnZCWkhBZ01CQUFFQw0KZ1lBNnlkV0h0OTR4a0RWZnhpaitDcXRkbnRQd0MreDFkeVFLSW11ZGRSWDVqbndPaS94OHI4azRHQVFuQ3ZpTg0KcCt1ampSL1ZTZWhyNnJaUEpKVWxZWmJUSFV0aGlKOVBlSWZoMytYalNYVmxqYWR6U2NOUzYrVnRpd3JVNm96dQ0KVGVBUHpkRVprVXBBQW5KM2wrUU13emJPRTZWMmdkdGZPU0trdGpGRVkxbkNzUUpCQUozR2R5Nm5JMnovdzVsZQ0KcUsySGRUTmNxKzA4WnRoTlZrdit6Mk91QTNkNnd1S1ZLSUljN1JyUHBwYXkyWEtYM1FQaHZSU1RCaTNtdFhFSw0Kak1RNnlsMENRUUNRSkUxSnpRNE9VdmJQRVJ3aS9yamt4VmVRWk9BbVBTUEdGMmc5M2NEcVp5bnVVRzFhOWl0TQ0KUDhZSmdKeDlWcHVUeGRselBWTVY5bURIU040a3hnRHpBa0IzcUpXclpFZVIyMGhWZ1YwY2ZxZDhsTVF2NEtkLw0KVk9nbUt0TFBIcUt5Y3dCcktBVFk2V2RKOWtLNStGckNkanJCUHV0UU4xRndicEVkY29yZ0tGWmhBa0E5Um5Gaw0Kc2pzTGM5RmY3VkljdmxRelRJRVE3UkVzc0VrSTZPSnppbFY4VUNiUEhIbWdkWTJxZUdIam9Eem1PMjhmdnJmVg0KK1hmY21rUkI4NFFiOWVCcEFrRUFqRUZrYkcxWEhoTTdmbTBOU3FLWVNaOFZYVExxeit3L0d1dXhqVnFOYnZYcw0Kb2p5QUhXV2VvWThKZi93WFM4TlVqVjFYZ1Q0TVU1WE5QM0M4VVcxeHdBPT0NCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0t";
+
+		var content = new StringContent(original, Encoding.UTF8, "text/plain");
+
+		var response = await httpClient.PostAsync("/dataconverter/base64:to", content).ConfigureAwait(false);
+		var actual = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+		Assert.Equal(expected, actual);
+	}
+
+	[Fact]
+	public async Task 將Base64字串轉換至原始字串()
+	{
+		await using var web = FiveSevenPayTestHost.WebApplicationFactory;
+
+		var httpClient = web.CreateClient();
+		
+		var base64 = "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQ0KTUlJQ1d3SUJBQUtCZ0ZqV0FwVXVaUW45WDNoYWJ4RDhhRnlGSUhoUjNKR0N6UVVnVWxxTk1HMzFTa3dsSWxKLw0KYWtKNHZ6M3FCQmFmTnhlNHR5TzR1cWR4VHp5cFVJOVBYbkNyazV6MU4rRk1iYVdYLzhjcitRZG5Bcmtjc3hKMA0KcCsyUXk5clpTa2FjeUNQak1FOVhKekllYktuZjBYVEdwVC96NlQwY3lSSTJIeEQxc2pIYnZCWkhBZ01CQUFFQw0KZ1lBNnlkV0h0OTR4a0RWZnhpaitDcXRkbnRQd0MreDFkeVFLSW11ZGRSWDVqbndPaS94OHI4azRHQVFuQ3ZpTg0KcCt1ampSL1ZTZWhyNnJaUEpKVWxZWmJUSFV0aGlKOVBlSWZoMytYalNYVmxqYWR6U2NOUzYrVnRpd3JVNm96dQ0KVGVBUHpkRVprVXBBQW5KM2wrUU13emJPRTZWMmdkdGZPU0trdGpGRVkxbkNzUUpCQUozR2R5Nm5JMnovdzVsZQ0KcUsySGRUTmNxKzA4WnRoTlZrdit6Mk91QTNkNnd1S1ZLSUljN1JyUHBwYXkyWEtYM1FQaHZSU1RCaTNtdFhFSw0Kak1RNnlsMENRUUNRSkUxSnpRNE9VdmJQRVJ3aS9yamt4VmVRWk9BbVBTUEdGMmc5M2NEcVp5bnVVRzFhOWl0TQ0KUDhZSmdKeDlWcHVUeGRselBWTVY5bURIU040a3hnRHpBa0IzcUpXclpFZVIyMGhWZ1YwY2ZxZDhsTVF2NEtkLw0KVk9nbUt0TFBIcUt5Y3dCcktBVFk2V2RKOWtLNStGckNkanJCUHV0UU4xRndicEVkY29yZ0tGWmhBa0E5Um5Gaw0Kc2pzTGM5RmY3VkljdmxRelRJRVE3UkVzc0VrSTZPSnppbFY4VUNiUEhIbWdkWTJxZUdIam9Eem1PMjhmdnJmVg0KK1hmY21rUkI4NFFiOWVCcEFrRUFqRUZrYkcxWEhoTTdmbTBOU3FLWVNaOFZYVExxeit3L0d1dXhqVnFOYnZYcw0Kb2p5QUhXV2VvWThKZi93WFM4TlVqVjFYZ1Q0TVU1WE5QM0M4VVcxeHdBPT0NCi0tLS0tRU5EIFJTQSBQUklWQVRFIEtFWS0tLS0t";
+
+		var expected = """
+			-----BEGIN RSA PRIVATE KEY-----
+			MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
+			akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
+			p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
+			gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
+			p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
+			TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
+			qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
+			jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
+			P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
+			VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
+			sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
+			+XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
+			ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
+			-----END RSA PRIVATE KEY-----
+			""";
+
+		var content = new StringContent(base64, Encoding.UTF8, "text/plain");
+
+		var response = await httpClient.PostAsync("/dataconverter/base64:from", content).ConfigureAwait(false);
+		var actual = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+
+		Assert.Equal(expected, actual);
+	}
+}

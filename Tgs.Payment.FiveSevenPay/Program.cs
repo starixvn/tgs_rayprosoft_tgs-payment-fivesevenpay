@@ -1,11 +1,13 @@
 using FluentdForward.OpenTelemetry.MessagePack;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using OpenTelemetry.Instrumentation.AspNetCore;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Tgs.Payment.FiveSevenPay;
+using Tgs.Payment.FiveSevenPay.InputFormatters;
 using Tgs.Payment.FiveSevenPay.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -63,7 +65,8 @@ builder.Services.AddMessageQueue()
 			"tgs.payment.fivesevenpay.withdraw"))
 	.AddNatsGlobPatternExchange("*");
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options 
+	=> options.InputFormatters.Add(new TextPlainInputFormatter()));
 
 builder.Services
 	.AddProfileViewer()
@@ -96,7 +99,25 @@ builder.Services
 			   && !new[] { "html", "ico", "png", "jpg" }.Any(
 				   ext => httpContext.Request.Path.Value.EndsWith($".{ext}")));
 
-builder.Services.AddSwaggerGen();
+builder.Services
+	//.AddEndpointsApiExplorer()
+	.AddSwaggerGen(options =>
+	{
+		options.SwaggerDoc("Payment", new OpenApiInfo
+		{
+			Title = "FiveSevenPay Service",
+			Version = "Payment"
+		});
+
+		options.SwaggerDoc("DataConverter", new OpenApiInfo
+		{
+			Title = "FiveSevenPay Service",
+			Version = "DataConverter"
+		});
+		
+		options.DocInclusionPredicate((groupName, desc)
+			=> desc.GroupName == groupName);
+	});
 
 builder.Services.AddHealthChecks();
 
@@ -122,6 +143,10 @@ app.Use(async (context, next) =>
 });
 
 app.MapSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(options =>
+{
+	options.SwaggerEndpoint("/swagger/Payment/swagger.json", "Tgs FiveSevenPay Service - Payment");
+	options.SwaggerEndpoint("/swagger/DataConverter/swagger.json", "Tgs FiveSevenPay Service - DataConverter");
+});
 
 app.Run();
