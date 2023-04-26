@@ -3,6 +3,7 @@ using System.Text.Json;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using Tgs.MessageQueue;
+using Tgs.Payment.Clients;
 using Tgs.Payment.FiveSevenPay.Client;
 using Tgs.Payment.Protos;
 
@@ -11,13 +12,16 @@ namespace Tgs.Payment.FiveSevenPay.MessageQueue;
 internal class WithdrawProcessor : IMessageProcessor
 {
 	private readonly FiveSevenPayClient _fiveSevenPayClient;
+	private readonly IPaymentClient _paymentClient;
 	private readonly FiveSevenPayOptions _options;
 
 	public WithdrawProcessor(
 		FiveSevenPayClient fiveSevenPayClient,
+		IPaymentClient paymentClient,
 		IOptions<FiveSevenPayOptions> optionsAccessor)
 	{
 		_fiveSevenPayClient = fiveSevenPayClient ?? throw new ArgumentNullException(nameof(fiveSevenPayClient));
+		_paymentClient = paymentClient ?? throw new ArgumentNullException(nameof(paymentClient));
 		_options = optionsAccessor.Value;
 	}
 
@@ -51,6 +55,11 @@ internal class WithdrawProcessor : IMessageProcessor
 			settings,
 			new FiveSevenPayWithdrawResponse(
 				withdrawResponse.FormId));
+
+		await _paymentClient.SaveWithdrawFormThirdPartyOrderNoAsync(
+			settings.FormId,
+			withdrawResponse.FormId.ToString(),
+			cancellationToken);
 
 		var msg = new WithdrawResponse
 		{
