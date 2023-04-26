@@ -59,7 +59,7 @@ internal class WithdrawProcessor : IMessageProcessor
 		await _paymentClient.SaveWithdrawFormThirdPartyOrderNoAsync(
 			settings.FormId,
 			withdrawResponse.FormId.ToString(),
-			cancellationToken);
+			cancellationToken).ConfigureAwait(false);
 
 		var msg = new WithdrawResponse
 		{
