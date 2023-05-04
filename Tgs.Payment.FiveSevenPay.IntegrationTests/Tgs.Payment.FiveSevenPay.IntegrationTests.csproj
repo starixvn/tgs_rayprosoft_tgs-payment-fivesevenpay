@@ -30,4 +30,8 @@
     <ProjectReference Include="..\Tgs.Payment.FiveSevenPay\Tgs.Payment.FiveSevenPay.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
 </Project>
