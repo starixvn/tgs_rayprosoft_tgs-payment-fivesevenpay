@@ -69,8 +69,16 @@ public class WithdrawTests
 		var timestamp = 1682055581;
 
 		var json = """
-{"outID":"8ff0cb83-3ead-4ba3-aa79-a18eafdfc5b0","status":"Payed","currency":"PHP","amount":"20","oamount":"20","agreeAmount":"20","orderType":"Transfer"}
-""";
+			{
+				"outID":"8ff0cb83-3ead-4ba3-aa79-a18eafdfc5b0",
+				"status":"Payed",
+				"currency":"PHP",
+				"amount":"20",
+				"oamount":"20",
+				"agreeAmount":"20",
+				"orderType":"Transfer"
+			}
+			""";
 
 		httpClient.DefaultRequestHeaders.Add("signature", signature);
 		httpClient.DefaultRequestHeaders.Add("timestamp", timestamp.ToString());

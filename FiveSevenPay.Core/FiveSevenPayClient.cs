@@ -70,15 +70,12 @@ internal class FiveSevenPayClient
 
 		_ = response.EnsureSuccessStatusCode();
 
-		var node = JsonSerializer.Deserialize<JsonNode>(body, _jsonSerializerOptions);
+		var node = JsonSerializer.Deserialize<JsonNode>(body, _jsonSerializerOptions)
+			?? throw new ApiFailException("Deposit response can't read.");
 
-		if (node is null)
-			throw new ApiFailException("Deposit response can't read.");
-
-		if (node["code"]!.ToString() != "0")
-			throw new ApiFailException(node["msg"]?.GetValue<string>());
-
-		return node["data"].Deserialize<FiveSevenPayClientDepositResponse>(_jsonSerializerOptions)!;
+		return node["code"]!.ToString() != "0"
+			? throw new ApiFailException(node["msg"]?.GetValue<string>())
+			: node["data"].Deserialize<FiveSevenPayClientDepositResponse>(_jsonSerializerOptions)!;
 	}
 
 	public async ValueTask<FiveSevenPayClientWithdrawResponse> WithdrawAsync(
@@ -120,14 +117,11 @@ internal class FiveSevenPayClient
 
 		_ = response.EnsureSuccessStatusCode();
 
-		var node = JsonSerializer.Deserialize<JsonNode>(body, _jsonSerializerOptions);
+		var node = JsonSerializer.Deserialize<JsonNode>(body, _jsonSerializerOptions)
+			?? throw new ApiFailException("Withdraw response can't read.");
 
-		if (node is null)
-			throw new ApiFailException("Withdraw response can't read.");
-
-		if (node["code"]!.ToString() != "0")
-			throw new ApiFailException(node["msg"]?.GetValue<string>());
-
-		return node["data"].Deserialize<FiveSevenPayClientWithdrawResponse>(_jsonSerializerOptions)!;
+		return node["code"]!.ToString() != "0"
+			? throw new ApiFailException(node["msg"]?.GetValue<string>())
+			: node["data"].Deserialize<FiveSevenPayClientWithdrawResponse>(_jsonSerializerOptions)!;
 	}
 }

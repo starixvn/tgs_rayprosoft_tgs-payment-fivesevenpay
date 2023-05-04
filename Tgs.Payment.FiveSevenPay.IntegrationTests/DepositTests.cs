@@ -71,8 +71,16 @@ public class DepositTests
 		var timestamp = 1681969474;
 		
 		var json = """
-{"outID":"a2554936-f976-4f60-b99a-f1c42f0b07f9","status":"Payed","currency":"PHP","amount":"100","oamount":"100","agreeAmount":"100","orderType":"Trade"}		
-""";
+			{
+				"outID":"a2554936-f976-4f60-b99a-f1c42f0b07f9",
+				"status":"Payed",
+				"currency":"PHP",
+				"amount":"100",
+				"oamount":"100",
+				"agreeAmount":"100",
+				"orderType":"Trade"
+			}
+			""";
 
 		httpClient.DefaultRequestHeaders.Add("signature", signature);
 		httpClient.DefaultRequestHeaders.Add("timestamp", timestamp.ToString());

@@ -22,22 +22,23 @@ public class HashTests
 	{
 		var jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
-		var privateKey = @"
------BEGIN RSA PRIVATE KEY-----
-MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
-akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
-p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
-gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
-p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
-TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
-qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
-jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
-P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
-VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
-sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
-+XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
-ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
------END RSA PRIVATE KEY-----";
+		var privateKey = """
+			-----BEGIN RSA PRIVATE KEY-----
+			MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
+			akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
+			p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
+			gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
+			p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
+			TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
+			qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
+			jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
+			P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
+			VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
+			sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
+			+XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
+			ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
+			-----END RSA PRIVATE KEY-----
+			""";
 
 		var merchantKey = "2b223bce3f024a3f885d213770a0fc5e";
 
@@ -59,13 +60,14 @@ ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
 
 		var actual = sut.ComputeHash(privateKey, dict, timestamp);
 
-		var publicKey = @"
------BEGIN PUBLIC KEY-----
-MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFjWApUuZQn9X3habxD8aFyFIHhR
-3JGCzQUgUlqNMG31SkwlIlJ/akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1
-N+FMbaWX/8cr+QdnArkcsxJ0p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0c
-yRI2HxD1sjHbvBZHAgMBAAE=
------END PUBLIC KEY-----";
+		var publicKey = """
+			-----BEGIN PUBLIC KEY-----
+			MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFjWApUuZQn9X3habxD8aFyFIHhR
+			3JGCzQUgUlqNMG31SkwlIlJ/akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1
+			N+FMbaWX/8cr+QdnArkcsxJ0p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0c
+			yRI2HxD1sjHbvBZHAgMBAAE=
+			-----END PUBLIC KEY-----
+			""";
 
 		var signature = Convert.FromBase64String(actual);
 
@@ -92,36 +94,46 @@ yRI2HxD1sjHbvBZHAgMBAAE=
 	[Fact]
 	public void Verify_Hash_Test()
 	{
-		var privateKey = @"
-	-----BEGIN RSA PRIVATE KEY-----
-	MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
-	akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
-	p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
-	gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
-	p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
-	TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
-	qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
-	jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
-	P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
-	VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
-	sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
-	+XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
-	ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
-	-----END RSA PRIVATE KEY-----";
+		var privateKey = """
+			-----BEGIN RSA PRIVATE KEY-----
+			MIICWwIBAAKBgFjWApUuZQn9X3habxD8aFyFIHhR3JGCzQUgUlqNMG31SkwlIlJ/
+			akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1N+FMbaWX/8cr+QdnArkcsxJ0
+			p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0cyRI2HxD1sjHbvBZHAgMBAAEC
+			gYA6ydWHt94xkDVfxij+CqtdntPwC+x1dyQKImuddRX5jnwOi/x8r8k4GAQnCviN
+			p+ujjR/VSehr6rZPJJUlYZbTHUthiJ9PeIfh3+XjSXVljadzScNS6+VtiwrU6ozu
+			TeAPzdEZkUpAAnJ3l+QMwzbOE6V2gdtfOSKktjFEY1nCsQJBAJ3Gdy6nI2z/w5le
+			qK2HdTNcq+08ZthNVkv+z2OuA3d6wuKVKIIc7RrPppay2XKX3QPhvRSTBi3mtXEK
+			jMQ6yl0CQQCQJE1JzQ4OUvbPERwi/rjkxVeQZOAmPSPGF2g93cDqZynuUG1a9itM
+			P8YJgJx9VpuTxdlzPVMV9mDHSN4kxgDzAkB3qJWrZEeR20hVgV0cfqd8lMQv4Kd/
+			VOgmKtLPHqKycwBrKATY6WdJ9kK5+FrCdjrBPutQN1FwbpEdcorgKFZhAkA9RnFk
+			sjsLc9Ff7VIcvlQzTIEQ7REssEkI6OJzilV8UCbPHHmgdY2qeGHjoDzmO28fvrfV
+			+XfcmkRB84Qb9eBpAkEAjEFkbG1XHhM7fm0NSqKYSZ8VXTLqz+w/GuuxjVqNbvXs
+			ojyAHWWeoY8Jf/wXS8NUjV1XgT4MU5XNP3C8UW1xwA==
+			-----END RSA PRIVATE KEY-----
+			""";
 
-		var publicKey = @"
-	-----BEGIN PUBLIC KEY-----
-	MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFjWApUuZQn9X3habxD8aFyFIHhR
-	3JGCzQUgUlqNMG31SkwlIlJ/akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1
-	N+FMbaWX/8cr+QdnArkcsxJ0p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0c
-	yRI2HxD1sjHbvBZHAgMBAAE=
-	-----END PUBLIC KEY-----";
+		var publicKey = """
+			-----BEGIN PUBLIC KEY-----
+			MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFjWApUuZQn9X3habxD8aFyFIHhR
+			3JGCzQUgUlqNMG31SkwlIlJ/akJ4vz3qBBafNxe4tyO4uqdxTzypUI9PXnCrk5z1
+			N+FMbaWX/8cr+QdnArkcsxJ0p+2Qy9rZSkacyCPjME9XJzIebKnf0XTGpT/z6T0c
+			yRI2HxD1sjHbvBZHAgMBAAE=
+			-----END PUBLIC KEY-----
+			""";
 
 		var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
 		var json = """
-{"outID":"a2554936-f976-4f60-b99a-f1c42f0b07f9","status":"Payed","currency":"PHP","amount":"100","oamount":"100","agreeAmount":"100","orderType":"Trade"}
-""";
+			{
+				"outID":"a2554936-f976-4f60-b99a-f1c42f0b07f9",
+				"status":"Payed",
+				"currency":"PHP",
+				"amount":"100",
+				"oamount":"100",
+				"agreeAmount":"100",
+				"orderType":"Trade"
+			}
+			""";
 
 		var fullText = $"{json}{timestamp}";
 
